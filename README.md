@@ -34,9 +34,9 @@ Current master:
 - cd into project
 - run: yarn
 - open an extra commandline
-- on one commandline 1 run: ndoemon index.js
-- on another commandline 2 run: yarn serve
-- open logged post on browser, probably 8080
+- on commandline 1 run: nodemon index.js
+- on commandline 2 run: yarn serve
+- open logged port on browser, probably 8080
 - click button. see log on server-commandline
 - hoeray, stuff is working
 
