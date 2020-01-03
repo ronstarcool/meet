@@ -1,29 +1,44 @@
-# meet
+# This readme includes: 
+- Done
+- Todo
+- How to get this repo started??
 
-## Project setup
-```
-yarn install
-```
+## Done
+vue
+express
 
-### Compiles and hot-reloads for development
-```
-yarn run serve
-```
+## Todo
+- config postgres: 1: db-setup, 2: routes, 3: seed
+- add modals for the vue front-end / user-options
+- make one start command / serve front-end on / or *
+- create some clear info-window
+- see if PWA is working
 
-### Compiles and minifies for production
-```
-yarn run build
-```
+### Front-end should show on intuition:
+- What is this?
+- What do they have?
+- What can i do here?
+- Why should i be here, and not some place else?
 
-### Run your tests
-```
-yarn run test
-```
+### Info window expands on this, and tell more detail.
+Words that come to mind here are:
+- Anonimous
+- No data gathering
+- No user-capturing / computer-enslavement
+- Meet real people
+- Fast, easy, connect, internet, bars, trains, directions, advice, shared-interest, 
 
-### Lints and fixes files
-```
-yarn run lint
-```
+## How to get this stuff started??
+Current master:
+- pull
+- cd into project
+- run: yarn
+- open an extra commandline
+- on one commandline 1 run: ndoemon index.js
+- on another commandline 2 run: yarn serve
+- open logged post on browser, probably 8080
+- click button. see log on server-commandline
+- hoeray, stuff is working
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Current develop:
+- adding postgres
