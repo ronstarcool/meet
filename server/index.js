@@ -17,20 +17,37 @@ const client = new Client({
   user: process.env.USER,
   password: process.env.PASSWORD,
   host: process.env.HOST,
-  port: process.env.PORT,
+  port: process.env.DBPORT,
   database: process.env.DATABASE,
 });
 
-app.post('/stuff', (req, res) => {
+client.connect();
+
+async function query(text, params) {
+  let result;
+  try {
+    result = await client.query(text, params);
+  } catch (err) {
+    console.log(err);
+  }
+  return result;
+}
+
+app.post('/stuff', async (req, res) => {
   console.log('yes we are connected sir!');
   console.log(req.body);
-
-  res.json({
-    message: 'Behold The MEVN Stack!',
-  });
+  const queryArray = [
+    req.body.id,
+    req.body.interest,
+    req.body.lat,
+    req.body.long,
+  ];
+  const result = await query('insert into users values($1, $2, $3, $4)', queryArray);
+  res.json({ message: result });
 });
 
-const port = process.env.PORT || 4000;
+const port = process.env.APIPORT || 4000;
+
 app.listen(port, () => {
   console.log(`listening on ${port}`);
 });
