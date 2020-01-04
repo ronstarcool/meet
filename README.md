@@ -41,4 +41,12 @@ Current master:
 - hoeray, stuff is working
 
 Current develop:
-- adding postgres
+- have a postgres db running
+- add a .env file looking something like this:
+```
+USER=postgres
+PASSWORD=password
+HOST=localhost
+PORT=5433
+DATABASE=meet
+```

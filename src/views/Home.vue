@@ -1,27 +1,38 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
     <button @click="connected">
       are we connected yet?
     </button>
+    <select v-model="myInterest">
+      <option value="A">A</option>
+      <option value="B">B</option>
+    </select>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue';
+// import HelloWorld from '@/components/HelloWorld.vue';
 
 export default {
   name: 'home',
 
   components: {
-    HelloWorld,
+    // HelloWorld,
+  },
+
+  data() {
+    return {
+      myInterest: null,
+    };
   },
 
   methods: {
     connected() {
-      fetch('http://localhost:4000/')
+      axios.post('http://localhost:4000/stuff', {
+        myInterest: this.myInterest,
+      })
         .then((r) => {
           console.log(r);
         });
