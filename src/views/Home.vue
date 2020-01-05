@@ -36,22 +36,13 @@ export default {
     };
   },
 
-  computed: {
-    typeLat() {
-      return typeof this.lat;
-    },
-    typeLong() {
-      return typeof this.long;
-    },
-  },
-
   methods: {
     connected() {
-      axios.post('http://localhost:4000/stuff', {
+      axios.post('http://localhost:4000/user', {
         id: this.id,
         interest: this.interest,
         lat: Number(parseFloat(this.lat).toFixed(4)),
-        long: parseFloat(this.long).toFixed(4),
+        long: Number(parseFloat(this.long).toFixed(4)),
       })
         .then((r) => {
           console.log(r);

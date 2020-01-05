@@ -22,6 +22,9 @@ express
 
 ### Info window expands on this, and tell more detail.
 Words that come to mind here are:
+- create
+- join
+- hot: see / join conversations nearby. like: a train stops in midtrack. whats going on? join the hot!-chat
 - Anonimous
 - No data gathering
 - No user-capturing / computer-enslavement
