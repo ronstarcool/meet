@@ -6,43 +6,64 @@
       <option value="B">B</option>
     </select>
     <hr>
-    <button @click="connected">
-      are we connected yet?
-    </button>
+    roomNum: <input type="text" v-model="roomNum">
+    <hr>
+    Are we a new user: <button @click="newUser = !newUser">{{ newUser }}</button>
+    <hr>
+    <button @click="connected">post this user</button>
     <hr>
     <button @click="getPosition">get position</button>
+    <hr>
+    <button @click="makeConnection">connect</button>
+    <button @click="testConnection">test connection</button>
+    <button @click="disConnect">disconnect</button>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import uuid from 'uuid';
-// @ is an alias to /src
+
 // import HelloWorld from '@/components/HelloWorld.vue';
 
 export default {
   name: 'home',
 
-  components: {
-    // HelloWorld,
-  },
-
   data() {
     return {
       id: uuid(),
-      interest: null,
+      interest: 'A',
       lat: null,
       long: null,
+      isConnected: false,
+      socketMessage: '',
+      newUser: true,
+      roomNum: 1,
     };
   },
 
   methods: {
+    makeConnection() {
+      this.$store.dispatch('makeConnection', this.roomNum);
+    },
+    testConnection() {
+      this.$store.dispatch('testConnection');
+    },
+    disConnect() {
+      this.$store.dispatch('disConnect');
+    },
+    pingServer() {
+      // Send the "pingServer" event to the server.
+      this.$socket.emit('pingServer', 'PING!');
+    },
     connected() {
       axios.post('http://localhost:4000/user', {
         id: this.id,
         interest: this.interest,
         lat: Number(parseFloat(this.lat).toFixed(4)),
         long: Number(parseFloat(this.long).toFixed(4)),
+        newUser: this.newUser,
+        roomNum: this.roomNum,
       })
         .then((r) => {
           console.log(r);
