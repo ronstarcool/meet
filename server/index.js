@@ -3,6 +3,7 @@ require('dotenv').config();
 const { Client } = require('pg');
 const express = require('express');
 const cors = require('cors');
+const uuid = require('uuid');
 
 const app = express();
 
@@ -12,6 +13,18 @@ const io = require('socket.io')(server);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('join_room', (roomId) => {
+    socket.join(roomId);
+  });
+
+  socket.on('message', (data) => {
+    socket.to(data.roomId).emit('message', data);
+  });
+});
 
 const client = new Client({
   user: process.env.USER,
@@ -35,22 +48,6 @@ async function query(text, params) {
   return result;
 }
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-
-  socket.on('join_room', (room) => {
-    socket.join(room);
-  });
-
-  socket.on('message', ({ room, message }) => {
-    socket.to(room).emit('message', {
-      message,
-      name: 'fred',
-    });
-  });
-});
-//= =================== https://www.youtube.com/watch?v=0B8TaM752KA
-
 app.post('/user', async (req, res) => {
   console.log('reached the backend route');
   console.log('req.body', req.body);
@@ -71,23 +68,27 @@ app.post('/user', async (req, res) => {
     AND interest = $3;`, [req.body.lat, req.body.long, req.body.interest]);
     // this stuff needs to be WAY expandid, but now only matches nearby chatters with same interest
 
-  // if (OptionalMatch.rows.length > 0) {
-  if (req.body.stuff1) {
-    console.log('in if');
-    // no insert, give room-id to "joining user"
-    console.log('dear user, we should set up a socket. and soon, we will!');
-    // use room-id from db / existing user ===================================
+  console.log('==========');
+  console.log(OptionalMatch.rows);
 
-    res.json({ message: 'found a match' }); // pass room-id
-  } else {
-    console.log('in else');
-    // no match was found, lets insert this user into the db
-    // generate room-id, and pass back, so user knows where to subscribe to
+  if (OptionalMatch.rows.length > 0) {
+  // if (req.body.stuff1) { // a match was found, give roomId to joining user
+    console.log('in if: dear user, we should set up a socket.');
 
-    console.log('no match was found, we will add you to the users db');
-    const result = await query('insert into users values($1, $2, $3, $4)', queryArray); // add socket-id
-    console.log(result);
-    res.json({ message: 'inserted' });
+    res.json({
+      message: 'found a match',
+      roomId: OptionalMatch.rows[0].roomid,
+    }); // pass room-id
+  } else { // no match was found, insert this user into the db
+    console.log('in else: no match was found, we will add you to the users db');
+    const roomId = uuid();
+
+    const result = await query('insert into users values($1, $2, $3, $4, $5)', [...queryArray, roomId]);
+    console.log('inserted: ', result);
+    res.json({
+      message: 'inserted',
+      roomId,
+    });
   }
 });
 
@@ -96,5 +97,3 @@ const port = process.env.APIPORT || 4000;
 server.listen(port, () => {
   console.log(`listening on ${port}`);
 });
-
-module.exports = { client };

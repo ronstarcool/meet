@@ -6,17 +6,22 @@
       <option value="B">B</option>
     </select>
     <hr>
-    roomNum: <input type="text" v-model="roomNum">
     <hr>
     Are we a new user: <button @click="newUser = !newUser">{{ newUser }}</button>
     <hr>
-    <button @click="connected">post this user</button>
+    <button @click="postUser">post this user</button>
     <hr>
     <button @click="getPosition">get position</button>
     <hr>
     <button @click="makeConnection">connect</button>
     <button @click="sendMessage">sendMessage</button>
     <button @click="disConnect">disconnect</button>
+    <ul>
+      <li v-for="(message, i) in messages" :key="i">
+        {{ message }}
+      </li>
+    </ul>
+    <div>roomId: {{ $store.state.roomId }}</div>
   </div>
 </template>
 
@@ -38,18 +43,23 @@ export default {
       isConnected: false,
       socketMessage: '',
       newUser: true,
-      roomNum: 1,
     };
+  },
+
+  computed: {
+    messages() {
+      return this.$store.state.messages;
+    },
   },
 
   methods: {
     makeConnection() {
-      this.$store.dispatch('makeConnection', this.roomNum);
+      this.$store.dispatch('makeConnection');
     },
     sendMessage() {
       this.$store.dispatch('sendMessage', {
-        num: this.roomNum,
         message: 'test-message',
+        uuid: this.uuid,
       });
     },
     disConnect() {
@@ -59,17 +69,17 @@ export default {
       // Send the "pingServer" event to the server.
       this.$socket.emit('pingServer', 'PING!');
     },
-    connected() {
+    postUser() {
       axios.post('http://localhost:4000/user', {
         id: this.id,
         interest: this.interest,
         lat: Number(parseFloat(this.lat).toFixed(4)),
         long: Number(parseFloat(this.long).toFixed(4)),
         newUser: this.newUser,
-        roomNum: this.roomNum,
       })
         .then((r) => {
           console.log(r);
+          this.$store.commit('setRoomId', r.data.roomId);
         });
     },
     getPosition() {
