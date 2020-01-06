@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import io from 'socket.io-client';
+import uuid from 'uuid';
 
 const ioConnection = io.connect('http://localhost:4000');
 
@@ -8,6 +9,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    userId: uuid(),
     roomId: null,
     messages: [],
   },
@@ -21,8 +23,9 @@ export default new Vuex.Store({
     },
     addOwnMessage(state, message) {
       state.messages.push({
-        ...message,
+        message,
         roomId: state.roomId,
+        userId: state.userId,
       });
     },
   },
@@ -37,12 +40,15 @@ export default new Vuex.Store({
         context.commit('addMessage', data);
       });
     },
-    sendMessage(context, data) {
-      console.log(data);
+    sendMessage(context, message) {
+      console.log(message);
+
+      context.commit('addOwnMessage', message);
 
       ioConnection.emit('message', {
-        ...data,
+        message,
         roomId: context.state.roomId,
+        userId: context.state.userId,
       });
     },
     disConnect() {

@@ -22,7 +22,6 @@
 
 <script>
 import axios from 'axios';
-import uuid from 'uuid';
 
 // import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -31,7 +30,6 @@ export default {
 
   data() {
     return {
-      id: uuid(),
       interest: 'A',
       lat: null,
       long: null,
@@ -54,7 +52,6 @@ export default {
     sendMessage() {
       this.$store.dispatch('sendMessage', {
         message: 'test-message',
-        userId: this.id,
       });
     },
     disConnect() {
