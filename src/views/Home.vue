@@ -16,11 +16,6 @@
     <button @click="makeConnection">connect</button>
     <button @click="sendMessage">sendMessage</button>
     <button @click="disConnect">disconnect</button>
-    <ul>
-      <li v-for="(message, i) in messages" :key="i">
-        {{ message }}
-      </li>
-    </ul>
     <div>roomId: {{ $store.state.roomId }}</div>
   </div>
 </template>
@@ -59,7 +54,7 @@ export default {
     sendMessage() {
       this.$store.dispatch('sendMessage', {
         message: 'test-message',
-        uuid: this.uuid,
+        userId: this.id,
       });
     },
     disConnect() {

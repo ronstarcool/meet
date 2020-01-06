@@ -19,6 +19,12 @@ export default new Vuex.Store({
     setRoomId(state, roomId) {
       state.roomId = roomId;
     },
+    addOwnMessage(state, message) {
+      state.messages.push({
+        ...message,
+        roomId: state.roomId,
+      });
+    },
   },
 
   actions: {
@@ -32,6 +38,8 @@ export default new Vuex.Store({
       });
     },
     sendMessage(context, data) {
+      console.log(data);
+
       ioConnection.emit('message', {
         ...data,
         roomId: context.state.roomId,

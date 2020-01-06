@@ -22,6 +22,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', (data) => {
+    console.log(data);
+
     socket.to(data.roomId).emit('message', data);
   });
 });
