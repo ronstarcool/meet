@@ -22,13 +22,16 @@ export default new Vuex.Store({
   actions: {
     makeConnection(context, num) {
       ioConnection = io.connect('http://localhost:4000');
-      ioConnection.on(`stuff${num}`, (data) => {
+      ioConnection.emit('join_room', `room-${num}`);
+      ioConnection.on('message', (data) => {
         console.log(data);
-        context.commit('addMessage', data);
       });
     },
-    testConnection() {
-      ioConnection.emit('message');
+    sendMessage(context, { num, message }) {
+      ioConnection.emit('message', {
+        room: `room-${num}`,
+        message,
+      });
     },
     disConnect() {
       ioConnection.on('leave', 'stuff');

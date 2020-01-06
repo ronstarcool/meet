@@ -15,7 +15,7 @@
     <button @click="getPosition">get position</button>
     <hr>
     <button @click="makeConnection">connect</button>
-    <button @click="testConnection">test connection</button>
+    <button @click="sendMessage">sendMessage</button>
     <button @click="disConnect">disconnect</button>
   </div>
 </template>
@@ -46,8 +46,11 @@ export default {
     makeConnection() {
       this.$store.dispatch('makeConnection', this.roomNum);
     },
-    testConnection() {
-      this.$store.dispatch('testConnection');
+    sendMessage() {
+      this.$store.dispatch('sendMessage', {
+        num: this.roomNum,
+        message: 'test-message',
+      });
     },
     disConnect() {
       this.$store.dispatch('disConnect');
