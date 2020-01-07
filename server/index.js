@@ -62,13 +62,14 @@ app.post('/user', async (req, res) => {
 
   // see if there is a match
   // await query("select * from users where lat < 51.8978 + 0.0007");
-  const OptionalMatch = await query(`select * from users where 
-    lat < $1 + 0.0007
-    AND lat > $1 - 0.0007
-    AND long < $2 + 0.0007
-    AND long > $2 - 0.0007
-    AND interest = $3;`, [req.body.lat, req.body.long, req.body.interest]);
-    // this stuff needs to be WAY expandid, but now only matches nearby chatters with same interest
+  const OptionalMatch = await query(`SELECT * FROM users WHERE 
+  lat < $1 + 0.0007
+  AND lat > $1 - 0.0007
+  AND long < $2 + 0.0007
+  AND long > $2 - 0.0007
+  AND interest = $3;`, [req.body.lat, req.body.long, req.body.interest]);
+  // this stuff needs to be WAY expandid, but now only matches nearby (+- 100m)
+  // chatters with same interest
 
   console.log('==========');
   console.log(OptionalMatch.rows);

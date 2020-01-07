@@ -1,7 +1,7 @@
 <template>
   <div>
     <form action="" @submit="submit">
-      <input type="text" v-model="message" >
+      <input ref="chatInput" type="text" v-model="message" >
       <button type="submit">submit</button>
     </form>
     <ul>
@@ -30,6 +30,11 @@ export default {
     return {
       message: null,
     };
+  },
+
+  mounted() {
+    console.log(this.$refs);
+    this.$refs.chatInput.focus();
   },
 
   computed: {

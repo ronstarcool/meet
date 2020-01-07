@@ -31,8 +31,9 @@ export default new Vuex.Store({
   },
 
   actions: {
-    makeConnection(context) {
-      ioConnection.emit('join_room', context.state.roomId);
+    makeConnection(context, roomId) {
+      context.commit('setRoomId', roomId);
+      ioConnection.emit('join_room', roomId);
       ioConnection.on('message', (data) => {
         console.log('hey there, the ioConnection.on is running');
 
