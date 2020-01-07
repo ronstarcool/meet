@@ -1,60 +1,83 @@
 <template>
   <div class="home">
-    pick ur interest:
-    <select v-model="interest">
-      <option value="A">A</option>
-      <option value="B">B</option>
-    </select>
-    <hr>
-    <button @click="connected">
-      are we connected yet?
-    </button>
-    <hr>
-    <button @click="getPosition">get position</button>
+    <div class="home__box">
+      <div>
+        I want to talk about:
+      <el-select v-model="interest" placeholder="Select">
+        <el-option
+          v-for="item in ['A', 'B']"
+          :key="item"
+          :label="item"
+          :value="item">
+        </el-option>
+      </el-select>
+      </div>
+      <el-button @click="connectWithPosition">connect to a nearby user</el-button>
+      <el-button @click="disConnect">disconnect</el-button>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import uuid from 'uuid';
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue';
+
+function generateLatLong(v) {
+  return v ? Number(parseFloat(v).toFixed(4)) : false;
+}
 
 export default {
   name: 'home',
 
-  components: {
-    // HelloWorld,
-  },
-
   data() {
     return {
-      id: uuid(),
-      interest: null,
+      interest: 'A',
       lat: null,
       long: null,
+      isConnected: false,
+      socketMessage: '',
     };
   },
 
+  computed: {
+    messages() {
+      return this.$store.state.messages;
+    },
+  },
+
   methods: {
-    connected() {
-      axios.post('http://localhost:4000/user', {
-        id: this.id,
-        interest: this.interest,
-        lat: Number(parseFloat(this.lat).toFixed(4)),
-        long: Number(parseFloat(this.long).toFixed(4)),
-      })
-        .then((r) => {
-          console.log(r);
+    disConnect() {
+      this.$store.dispatch('disConnect');
+    },
+    // pingServer() {
+    //   // Send the "pingServer" event to the server.
+    //   this.$socket.emit('pingServer', 'PING!');
+    // },
+    connectWithPosition() {
+      this.getPosition()
+        .then(() => {
+          axios.post('http://localhost:4000/user', {
+            id: this.id,
+            interest: this.interest,
+            lat: generateLatLong(this.lat),
+            long: generateLatLong(this.long),
+          })
+            .then((r) => {
+              console.log(r);
+              this.$store.dispatch('makeConnection', r.data.roomId);
+              this.$router.push('/chat');
+            });
         });
     },
     getPosition() {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        console.log(pos);
+      return new Promise((res) => {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          console.log(pos);
 
-        // this.lat = Math.round(parseFloat(pos.coords.latitude).toFixed(4) * 10000);
-        this.lat = pos.coords.latitude;
-        this.long = pos.coords.longitude;
+          // this.lat = Math.round(parseFloat(pos.coords.latitude).toFixed(4) * 10000);
+          this.lat = pos.coords.latitude;
+          this.long = pos.coords.longitude;
+          res();
+        });
         // One degree of either is approximately 69 miles (111 kilometers) apart
         // it comes in 7 decimals: 5.8957957
         // so, 5.8957956 would be 10cm away.
@@ -72,3 +95,32 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.home {
+  height: calc(100% - 54px);
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  &__box {
+    background: black;
+    border-radius: 6px;
+    height: 400px;
+    width: 400px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+
+    & > * {
+      margin: 20px 0;
+    }
+  }
+
+  button {
+    width: 210px;
+  }
+}
+</style>

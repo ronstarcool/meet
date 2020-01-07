@@ -3,12 +3,30 @@ require('dotenv').config();
 const { Client } = require('pg');
 const express = require('express');
 const cors = require('cors');
+const uuid = require('uuid');
 
 const app = express();
+
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('join_room', (roomId) => {
+    socket.join(roomId);
+  });
+
+  socket.on('message', (data) => {
+    console.log(data);
+
+    socket.to(data.roomId).emit('message', data);
+  });
+});
 
 const client = new Client({
   user: process.env.USER,
@@ -44,34 +62,41 @@ app.post('/user', async (req, res) => {
 
   // see if there is a match
   // await query("select * from users where lat < 51.8978 + 0.0007");
-  const OptionalMatch = await query(`select * from users where 
-    lat < $1 + 0.0007
-    AND lat > $1 - 0.0007
-    AND long < $2 + 0.0007
-    AND long > $2 - 0.0007
-    AND interest = $3;`, [req.body.lat, req.body.long, req.body.interest]);
-    // this stuff needs to be WAY expandid, but now only matches nearby chatters with same interest
+  const OptionalMatch = await query(`SELECT * FROM users WHERE 
+  lat < $1 + 0.0007
+  AND lat > $1 - 0.0007
+  AND long < $2 + 0.0007
+  AND long > $2 - 0.0007
+  AND interest = $3;`, [req.body.lat, req.body.long, req.body.interest]);
+  // this stuff needs to be WAY expandid, but now only matches nearby (+- 100m)
+  // chatters with same interest
+
+  console.log('==========');
+  console.log(OptionalMatch.rows);
 
   if (OptionalMatch.rows.length > 0) {
-    // no insert, but generate a socket.io. or maybe we should insert.
-    // cause if the first user leaves, the socket would be gone
-    console.log('dear user, we should set up a socket. and soon, we will!');
-    // use socket-id from db
-    res.json({ message: 'found a match' });
-  } else {
-    // no match was found, lets insert this user into the db
-    // generate socket-id
-    console.log('no match was found, we will add you to the users db');
-    const result = await query('insert into users values($1, $2, $3, $4)', queryArray); // add socket-id
-    console.log(result);
-    res.json({ message: 'inserted' });
+  // if (req.body.stuff1) { // a match was found, give roomId to joining user
+    console.log('in if: dear user, we should set up a socket.');
+
+    res.json({
+      message: 'found a match',
+      roomId: OptionalMatch.rows[0].roomid,
+    }); // pass room-id
+  } else { // no match was found, insert this user into the db
+    console.log('in else: no match was found, we will add you to the users db');
+    const roomId = uuid();
+
+    const result = await query('insert into users values($1, $2, $3, $4, $5)', [...queryArray, roomId]);
+    console.log('inserted: ', result);
+    res.json({
+      message: 'inserted',
+      roomId,
+    });
   }
 });
 
 const port = process.env.APIPORT || 4000;
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`listening on ${port}`);
 });
-
-module.exports = { client };

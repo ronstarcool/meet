@@ -1,16 +1,24 @@
-// import { client } from './index.js';
-// const indexJs = require('./index.js');
-const { client } = require('./index.js');
+require('dotenv').config();
 
+const { Client } = require('pg');
 
-// const { client } = indexJs;
+const client = new Client({
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  host: process.env.HOST,
+  port: process.env.DBPORT,
+  database: process.env.DATABASE,
+});
 
 client.connect();
 
 async function start() {
   await client.query(`CREATE TABLE users(
-        id INT PRIMARY KEY NOT NULL,
-        interest char(40) NOT NULL
+        id uuid PRIMARY KEY NOT NULL,
+        interest char(40) NOT NULL,
+        lat numeric,
+        long numeric,
+        roomId uuid
     )`);
 
   client.end();
