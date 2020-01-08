@@ -2,8 +2,7 @@
   <div class="home">
     <div class="home__box">
       <div>
-        I want to talk about:
-      <el-select v-model="interest" placeholder="Select">
+      <el-select v-model="interest" placeholder="Select your favorite subject">
         <el-option
           v-for="item in ['A', 'B']"
           :key="item"
@@ -117,10 +116,12 @@ export default {
     & > * {
       margin: 20px 0;
     }
+
+    button.el-button {
+      margin: 10px 0;
+      width: 210px;
+    }
   }
 
-  button {
-    width: 210px;
-  }
 }
 </style>

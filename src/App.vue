@@ -5,21 +5,27 @@
         <router-link to="/chat">Chat</router-link>
         <router-link to="/about">About</router-link>
     </div>
-    <transition
-        name="slide"
-        mode="out-in">
-      <router-view/>
-    </transition>
+    <div style="width: 100%">
+      <transition
+          name="slide"
+          mode="out-in">
+          <router-view/>
+        </transition>
+      </div>
   </div>
 </template>
 
 <style lang="scss">
+$transitionTime: 1s;
+
 body {
   margin: 0;
 }
 
 .app {
   height: 100vh;
+  max-width: 100%;
+  overflow: hidden;
 
   &__nav {
     background: black;
@@ -41,7 +47,8 @@ body {
 }
 
 .slide-enter {
-  left: 100vw;
+  left: 500px;
+  opacity: 0;
 }
 
 .slide-enter-to {
@@ -53,16 +60,17 @@ body {
 }
 
 .slide-leave-to {
-  left: -100vw;
+  left: 500px;
+  opacity: 0;
 }
 
 .slide-enter-active {
-  transition: all 0.5s linear 0.5s;
+  transition: all $transitionTime ease;
   position: relative;
 }
 
 .slide-leave-active {
-  transition: all 0.5s linear 0.5s;
+  transition: all $transitionTime ease;
   position: relative;
 }
 </style>

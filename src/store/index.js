@@ -16,6 +16,8 @@ export default new Vuex.Store({
 
   mutations: {
     addMessage(state, data) {
+      console.log('adding a message');
+
       state.messages.push(data);
     },
     setRoomId(state, roomId) {
@@ -23,7 +25,7 @@ export default new Vuex.Store({
     },
     addOwnMessage(state, message) {
       state.messages.push({
-        message,
+        ...message,
         roomId: state.roomId,
         userId: state.userId,
       });
@@ -47,7 +49,7 @@ export default new Vuex.Store({
       context.commit('addOwnMessage', message);
 
       ioConnection.emit('message', {
-        message,
+        ...message,
         roomId: context.state.roomId,
         userId: context.state.userId,
       });

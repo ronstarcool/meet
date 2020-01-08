@@ -1,18 +1,19 @@
 <template>
-  <div>
+  <div class="chat">
     <form action="" @submit="submit">
-      <input ref="chatInput" type="text" v-model="message" >
-      <button type="submit">submit</button>
+      <el-input ref="chatInput" type="text" v-model="text" />
+      <el-button type="submit">submit</el-button>
     </form>
     <ul>
-      <transition-group name="messages-list" tag="div">
+      <transition-group name="messages" tag="div">
         <li
           v-for="(message, i) in decoratedMessages"
           :key="i"
           :class="message.color"
         >
-          <div>{{ message.message }}</div>
-          <div>{{ message.userId }}</div>
+          <el-badge :value="message.count">
+            <el-button>{{ message.text }}</el-button>
+          </el-badge>
         </li>
       </transition-group>
     </ul>
@@ -28,7 +29,8 @@ export default {
 
   data() {
     return {
-      message: null,
+      count: 1,
+      text: null,
     };
   },
 
@@ -39,7 +41,7 @@ export default {
 
   computed: {
     ...mapState(['userId', 'roomId', 'messages']),
-    allUserIds() { // [ownId, otherId, otherId]
+    allUserIds() { // outputs: [ownId, otherId, otherId]
       return [
         this.userId,
         ...uniq(this.messages
@@ -58,8 +60,12 @@ export default {
   methods: {
     submit(e) {
       e.preventDefault();
+      this.count++;
       console.log(this.message);
-      this.$store.dispatch('sendMessage', this.message);
+      this.$store.dispatch('sendMessage', {
+        text: this.text,
+        count: this.count,
+      });
     },
   },
 };
@@ -68,30 +74,58 @@ export default {
 <style lang="scss">
 $colors: red, blue, green;
 
-@each $color in $colors {
-  ul li.color-#{index($colors, $color)} {
-    color: $color;
+.chat {
+  margin: auto;
+  width: 400px;
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+
+    sup, button {
+      margin-top: 12px;
+    }
+
+    li {
+      display: flex;
+
+      &.color-1 {
+        justify-content: flex-end;
+      }
+    }
   }
-}
 
-.color-0 {
-  color: blue;
-}
+  @each $color in $colors {
+    ul li.color-#{index($colors, $color)} .el-badge__content {
+      background: $color;
+    }
+  }
 
-.color-1 {
-  color: red;
-}
+  form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-.messages-list-enter-active {
-  transition: all 1s;
-}
+    .el-input {
+      margin: 20px 20px 20px 0;
+      width: 250px !important;
+    }
 
-.messages-list-enter {
-  opacity: 0;
-  transform: translateX(130px);
-}
-.messages-list-enter.color-0 {
-  transform: translateX(-130px);
+    .el-button {
+      width: 150px;
+    }
+  }
+
+  .messages-enter-active {
+    transition: all 1s;
+  }
+  .messages-enter {
+    opacity: 0;
+    transform: translateX(130px);
+  }
+  .messages-enter.color-1 {
+    transform: translateX(-130px);
+  }
 }
 
 </style>
