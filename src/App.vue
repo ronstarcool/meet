@@ -24,7 +24,7 @@ body {
 
 .app {
   height: 100vh;
-  max-width: 100%;
+  width: 100vw;
   overflow: hidden;
 
   &__nav {
