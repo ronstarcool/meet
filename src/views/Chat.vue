@@ -1,6 +1,7 @@
 <template>
   <div class="chat">
-    <form action="" @submit="submit">
+    <name-field @setName="setName" />
+    <form class="chat__form" action="" @submit="submit">
       <el-input ref="chatInput" type="text" v-model="text" />
       <el-button type="submit">submit</el-button>
     </form>
@@ -23,14 +24,21 @@
 <script>
 import { mapState } from 'vuex';
 import { uniq } from 'lodash';
+import NameField from '@/components/name-field.vue';
 
 export default {
   name: 'chat',
 
+  components: {
+    NameField,
+  },
+
   data() {
     return {
-      count: 1,
+      count: 0,
       text: null,
+      anonimous: true,
+      name: null,
     };
   },
 
@@ -58,6 +66,9 @@ export default {
   },
 
   methods: {
+    setName(v) {
+      this.name = v;
+    },
     submit(e) {
       e.preventDefault();
       this.count++;
@@ -80,7 +91,7 @@ $colors: red, blue, green;
 
   ul {
     list-style-type: none;
-    padding: 0;
+    padding: 10px;
 
     sup, button {
       margin-top: 12px;
@@ -101,10 +112,10 @@ $colors: red, blue, green;
     }
   }
 
-  form {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  &__form {
+    padding: 10px;
+
+    @include flex();
 
     .el-input {
       margin: 20px 20px 20px 0;
@@ -119,13 +130,14 @@ $colors: red, blue, green;
   .messages-enter-active {
     transition: all 1s;
   }
+
   .messages-enter {
     opacity: 0;
     transform: translateX(130px);
   }
+
   .messages-enter.color-1 {
     transform: translateX(-130px);
   }
 }
-
 </style>
