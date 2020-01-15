@@ -1,31 +1,127 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-    <button @click="connected">
-      are we connected yet?
-    </button>
+    <div class="home__box">
+      <div>
+      <el-select v-model="interest" placeholder="Select your favorite subject">
+        <el-option
+          v-for="item in ['A', 'B']"
+          :key="item"
+          :label="item"
+          :value="item">
+        </el-option>
+      </el-select>
+      </div>
+      <el-button @click="connectWithPosition">connect to a nearby user</el-button>
+      <el-button @click="disConnect">disconnect</el-button>
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue';
+import axios from 'axios';
+
+function generateLatLong(v) {
+  return v ? Number(parseFloat(v).toFixed(4)) : false;
+}
 
 export default {
   name: 'home',
 
-  components: {
-    HelloWorld,
+  data() {
+    return {
+      interest: 'A',
+      lat: null,
+      long: null,
+      isConnected: false,
+      socketMessage: '',
+    };
+  },
+
+  computed: {
+    messages() {
+      return this.$store.state.messages;
+    },
   },
 
   methods: {
-    connected() {
-      fetch('http://localhost:4000/')
-        .then((r) => {
-          console.log(r);
+    disConnect() {
+      this.$store.dispatch('disConnect');
+    },
+    // pingServer() {
+    //   // Send the "pingServer" event to the server.
+    //   this.$socket.emit('pingServer', 'PING!');
+    // },
+    connectWithPosition() {
+      this.getPosition()
+        .then(() => {
+          axios.post('http://localhost:4000/user', {
+            id: this.id,
+            interest: this.interest,
+            lat: generateLatLong(this.lat),
+            long: generateLatLong(this.long),
+          })
+            .then((r) => {
+              console.log(r);
+              this.$store.dispatch('makeConnection', r.data.roomId);
+              this.$router.push('/chat');
+            });
         });
+    },
+    getPosition() {
+      return new Promise((res) => {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          console.log(pos);
+
+          // this.lat = Math.round(parseFloat(pos.coords.latitude).toFixed(4) * 10000);
+          this.lat = pos.coords.latitude;
+          this.long = pos.coords.longitude;
+          res();
+        });
+        // One degree of either is approximately 69 miles (111 kilometers) apart
+        // it comes in 7 decimals: 5.8957957
+        // so, 5.8957956 would be 10cm away.
+        // 7the decimal: 1cm
+        // 6the decimal: 10cm
+        // 5the decimal: 1m
+        // 4the decimal: 10m <---- seems like one we can use
+        // 3the decimal: 100m
+        // 2the decimal: 1km
+        // 1the decimal: 10km
+        // 1 degree: 111km
+        // 360 degrees: 40.000km / earth's circumference
+      });
     },
   },
 };
 </script>
+
+<style lang="scss">
+.home {
+  height: calc(100% - 54px);
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  &__box {
+    background: black;
+    border-radius: 6px;
+    height: 400px;
+    width: 400px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+
+    & > * {
+      margin: 20px 0;
+    }
+
+    button.el-button {
+      margin: 10px 0;
+      width: 210px;
+    }
+  }
+
+}
+</style>

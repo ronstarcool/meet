@@ -22,6 +22,9 @@ express
 
 ### Info window expands on this, and tell more detail.
 Words that come to mind here are:
+- create
+- join
+- hot: see / join conversations nearby. like: a train stops in midtrack. whats going on? join the hot!-chat
 - Anonimous
 - No data gathering
 - No user-capturing / computer-enslavement
@@ -41,4 +44,12 @@ Current master:
 - hoeray, stuff is working
 
 Current develop:
-- adding postgres
+- have a postgres db running
+- add a .env file looking something like this:
+```
+USER=postgres
+PASSWORD=password
+HOST=localhost
+PORT=5433
+DATABASE=meet
+```
